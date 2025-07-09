@@ -1,4 +1,7 @@
+import 'package:bus_management/Provider/UserProvider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -18,8 +21,8 @@ class _RegisterFormState extends State<RegisterForm> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-
-  @override
+String _selectedRole ="مشرف";
+    @override
   void dispose() {
     _usernameController.dispose();
     _firstNameController.dispose();
@@ -29,16 +32,53 @@ class _RegisterFormState extends State<RegisterForm> {
     _confirmPasswordController.dispose();
     super.dispose();
   }
+Future<void> addUser(String username,String firtsName,String lastName, String password, String role,String? email ) async {
+  try {
+    await FirebaseFirestore.instance.collection('Users').add({
+      'UserName': username,
+      'Password': password,
+      'Role': role,
+      'FirstName': firtsName,
+      'LastName': lastName,
+      'Email': email,
+      'CreatedAt': Timestamp.now(),
+    });
+    print('User added successfully!');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('تم إضافة المستخدم بنجاح')),
+    );
 
-  void _register() {
+    Navigator.pushReplacementNamed(context, '/home');
+  } catch (e) {
+    print('Error adding user: $e');
+  }
+}
+
+  void _register() async {
     if (_formKey.currentState!.validate()) {
       final username = _usernameController.text;
+    final query = await FirebaseFirestore.instance
+        .collection('Users')
+        .where('UserName', isEqualTo: username)
+        
+        .get();
+
+    if (query.docs.isEmpty) {
+addUser(username, _firstNameController.text, _lastNameController.text,
+          _passwordController.text, _selectedRole, _emailController.text.isEmpty ? null : _emailController.text);
+    }
+    else{
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تم إرسال طلب المستخدم الجديد: $username')),
+        SnackBar(content: Text('اسم المستخدم موجود بالفعل')),
       );
-      // Add your registration logic here
+    }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('يرجى ملء جميع الحقول بشكل صحيح')),
+      );
     }
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +143,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   TextFormField(
                     controller: _lastNameController,
                     decoration: InputDecoration(
-                      labelText: 'الاسم النهائي',
+                      labelText: 'الاسم العائله',
                       prefixIcon: Icon(Icons.account_circle_outlined),
                       border: OutlineInputBorder(),
                       enabledBorder: OutlineInputBorder(
@@ -147,6 +187,38 @@ class _RegisterFormState extends State<RegisterForm> {
                     },
                   ),
                   const SizedBox(height: 20),
+                  DropdownButtonFormField<String>(
+                    value: _selectedRole,
+                    decoration: InputDecoration(
+                      labelText: 'اختر الدور',
+                      prefixIcon: Icon(Icons.assignment_ind),
+                      border: OutlineInputBorder(),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                        borderSide: BorderSide(
+                          color: const Color.fromRGBO(0, 150, 136, 1),
+                          width: 2.0,
+                        ),
+                      ),
+                    ),
+                    items: [
+                      DropdownMenuItem(value: 'مدير', child: Text('مدير')),
+                      DropdownMenuItem(value: 'مشرف', child: Text('مشرف')),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedRole != value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'يرجى اختيار الدور';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+
                   TextFormField(
                     controller: _passwordController,
                     obscureText: obscureText,

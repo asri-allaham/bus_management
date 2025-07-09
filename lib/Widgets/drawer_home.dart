@@ -1,4 +1,6 @@
+import 'package:bus_management/Provider/UserProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DrawerHome extends StatelessWidget {
   const DrawerHome({super.key});
@@ -21,7 +23,8 @@ class DrawerHome extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/home');
             },
           ),
-          ListTile(
+          if (Provider.of<UserProvider>(context).role == 'مدير') ...[
+            ListTile(
             leading: Icon(Icons.person),
             title: Text(' تسجيل مستخدم جديد'),
             onTap: () {
@@ -35,11 +38,28 @@ class DrawerHome extends StatelessWidget {
               Navigator.pushNamed(context, "/travelHistory");
             },
           ),
+            ListTile(
+              leading: Icon(Icons.admin_panel_settings),
+              title: Text('إدارة المستخدمين'),
+              onTap: () {
+                Navigator.pushNamed(context, '/manageUsers');
+              },
+            ),
+          ],
+         
           ListTile(
             leading: Icon(Icons.login),
             title: Text('تسجيل الخروج'),
             onTap: () {
+              Provider.of<UserProvider>(context, listen: false).clearUsername();
+              Provider.of<UserProvider>(context, listen: false).clearUserRole();
+              // Navigate to the login screen
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('تم تسجيل الخروج بنجاح')),
+              );
+              // Clear the username and role from the provider
               Navigator.pushReplacementNamed(context, '/login');
+
             },
           ),
         ],

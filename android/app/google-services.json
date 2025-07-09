@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "205110899501",
+    "project_id": "busstopsytem",
+    "storage_bucket": "busstopsytem.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:205110899501:android:8de22b900d52ede82059a4",
+        "android_client_info": {
+          "package_name": "com.example.bus_management"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "205110899501-odv7gss5rlcu1vcrcer69d2f5f9smq9f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1SpujwPN_NAFLeAtAc5zNe52ujKzBfCI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "205110899501-odv7gss5rlcu1vcrcer69d2f5f9smq9f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,7 @@
+import 'package:bus_management/Provider/UserProvider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -20,15 +23,31 @@ class _LoginFormState extends State<LoginForm> {
     super.dispose();
   }
 
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      // Example: print or handle login logic
-      final username = _usernameController.text;
-      final password = _passwordController.text;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('مرحباً $username!')));
-      // Add your authentication logic here
+/// Searches for a user in the Firestore database based on the provided username and password.
+/// Returns true if the user is found, otherwise returns false.
+/// This function also sets the username and user role in the UserProvider context.
+   Future<bool> searchUser() async {
+    String username = _usernameController.text.trim();
+    String password = _passwordController.text.trim();
+
+    final query = await FirebaseFirestore.instance
+        .collection('Users')
+        .where('UserName', isEqualTo: username)
+        .where('Password', isEqualTo: password)
+        .get();
+
+    if (query.docs.isNotEmpty) {
+          Provider.of<UserProvider>(context, listen: false).setUsername(username);
+          final userDoc = query.docs.first;
+    final role = userDoc['Role'];
+              Provider.of<UserProvider>(context, listen: false).setUserRole(role);
+
+      
+    return true;
+
+    }  else {
+           return false;
+
     }
   }
 
@@ -115,8 +134,30 @@ class _LoginFormState extends State<LoginForm> {
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
                       ),
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/home');
+                      onPressed: ()  async{
+                        final res = await searchUser();
+                        if(  res == false){
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('اسم المستخدم أو الرقم السري غير صحيح'),
+                            ),
+                          );
+                          return;
+                        }
+                        else if (_formKey.currentState!.validate()) {
+                          final username = _usernameController.text;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('مرحباً $username!')),
+                          );
+                          Navigator.pushReplacementNamed(context, '/home');
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('يرجى ملء جميع الحقول بشكل صحيح'),
+                            ),
+                          );  
+                        }
+
                       },
                       child: const Text(
                         'تسجيل الدخول',

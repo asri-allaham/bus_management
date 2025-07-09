@@ -1,5 +1,7 @@
 import 'package:bus_management/Widgets/drawer_home.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:bus_management/Provider/UserProvider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -7,6 +9,8 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
+
+
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
