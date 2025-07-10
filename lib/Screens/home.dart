@@ -1,7 +1,5 @@
 import 'package:bus_management/Widgets/drawer_home.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:bus_management/Provider/UserProvider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

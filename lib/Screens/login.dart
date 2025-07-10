@@ -1,7 +1,5 @@
-import 'package:bus_management/Provider/UserProvider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:bus_management/Models/databaseLogin.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -23,33 +21,6 @@ class _LoginFormState extends State<LoginForm> {
     super.dispose();
   }
 
-/// Searches for a user in the Firestore database based on the provided username and password.
-/// Returns true if the user is found, otherwise returns false.
-/// This function also sets the username and user role in the UserProvider context.
-   Future<bool> searchUser() async {
-    String username = _usernameController.text.trim();
-    String password = _passwordController.text.trim();
-
-    final query = await FirebaseFirestore.instance
-        .collection('Users')
-        .where('UserName', isEqualTo: username)
-        .where('Password', isEqualTo: password)
-        .get();
-
-    if (query.docs.isNotEmpty) {
-          Provider.of<UserProvider>(context, listen: false).setUsername(username);
-          final userDoc = query.docs.first;
-    final role = userDoc['Role'];
-              Provider.of<UserProvider>(context, listen: false).setUserRole(role);
-
-      
-    return true;
-
-    }  else {
-           return false;
-
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +106,9 @@ class _LoginFormState extends State<LoginForm> {
                         shadowColor: Colors.transparent,
                       ),
                       onPressed: ()  async{
-                        final res = await searchUser();
+                        String username = _usernameController.text;
+                        String password = _passwordController.text;
+                        final res = await searchUser(username, password, context);
                         if(  res == false){
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

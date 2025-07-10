@@ -1,7 +1,6 @@
-import 'package:bus_management/Provider/UserProvider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:bus_management/Models/databaseMethodes.dart';
+import 'package:bus_management/Models/databaseRegister.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -32,40 +31,14 @@ String _selectedRole ="مشرف";
     _confirmPasswordController.dispose();
     super.dispose();
   }
-Future<void> addUser(String username,String firtsName,String lastName, String password, String role,String? email ) async {
-  try {
-    await FirebaseFirestore.instance.collection('Users').add({
-      'UserName': username,
-      'Password': password,
-      'Role': role,
-      'FirstName': firtsName,
-      'LastName': lastName,
-      'Email': email,
-      'CreatedAt': Timestamp.now(),
-    });
-    print('User added successfully!');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('تم إضافة المستخدم بنجاح')),
-    );
-
-    Navigator.pushReplacementNamed(context, '/home');
-  } catch (e) {
-    print('Error adding user: $e');
-  }
-}
-
   void _register() async {
     if (_formKey.currentState!.validate()) {
       final username = _usernameController.text;
-    final query = await FirebaseFirestore.instance
-        .collection('Users')
-        .where('UserName', isEqualTo: username)
-        
-        .get();
+      final exists =  await userExsest(username);
 
-    if (query.docs.isEmpty) {
+    if (!exists) {
 addUser(username, _firstNameController.text, _lastNameController.text,
-          _passwordController.text, _selectedRole, _emailController.text.isEmpty ? null : _emailController.text);
+          _passwordController.text, _selectedRole, _emailController.text.isEmpty ? null : _emailController.text, context);
     }
     else{
       ScaffoldMessenger.of(context).showSnackBar(
